@@ -27,7 +27,18 @@ resource "aws_internet_gateway" "igw" {
     { Name = "${var.env}-igw"}
   )
 }
+# elastic Ip
+resource "aws_eip" "nat_eip" {
+  for_each = var.public_subnets
+  domain = vpc // earlier vpc = true
+}
 
+# Nat Gateway
+resource "aws_nat_gateway" "nat_gateways" {
+  for_each = var.public_subnets
+  allocation_id = aws_eip.nat_eip[each.value["name"]].id
+  subnet_id = aws_subnet.public_subnets[each.value["name"]].id
+}
 
 ##Public Route Tables
 resource "aws_route_table" "public-route-table" {
