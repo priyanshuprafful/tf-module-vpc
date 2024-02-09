@@ -30,7 +30,7 @@ resource "aws_internet_gateway" "igw" {
 # elastic Ip
 resource "aws_eip" "nat_eip" {
   for_each = var.public_subnets
-  vpc = true
+  vpc = true ## this has been depracated , we have to use domain instead , learn yourself on this
   tags = merge(
     var.tags ,
     { Name = "${var.env}-${each.value["name"]}-elastic-ip"}
@@ -92,8 +92,14 @@ resource "aws_subnet" "private_subnets" {
 # Private Route Tables
 resource "aws_route_table" "private-route-table" {
   vpc_id = aws_vpc.main.id
-
   for_each = var.private_subnets
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gateways["public-${split("-", each.value["name"])[1]}"].id
+  }
+
+
   tags = merge(
     var.tags ,
     { Name = "${var.env}-${each.value["name"]}-route_table"} # adding route_table at the end for better understanding
