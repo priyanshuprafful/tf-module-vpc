@@ -31,6 +31,10 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_eip" "nat_eip" {
   for_each = var.public_subnets
   vpc = true
+  tags = merge(
+    var.tags ,
+    { Name = "${var.env}-${each.value["name"]}-elastic-ip"}
+  )
 }
 
 # Nat Gateway
