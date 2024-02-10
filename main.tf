@@ -88,7 +88,10 @@ resource "aws_subnet" "private_subnets" {
     { Name = "${var.env}-${each.value["name"]}"}
   )
 }
-
+locals {
+  for_each = var.private_subnets
+  az = split("-", "each.value["name"]")[1]
+}
 # Private Route Tables
 resource "aws_route_table" "private-route-table" {
   vpc_id = aws_vpc.main.id
@@ -96,7 +99,7 @@ resource "aws_route_table" "private-route-table" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat_gateways["public-${split("-", each.value["name"])[1]}"].id
+    nat_gateway_id = aws_nat_gateway.nat_gateways["public-${local.az}"].id
   }
 
 
