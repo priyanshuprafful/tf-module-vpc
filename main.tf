@@ -12,6 +12,10 @@ resource "aws_vpc_peering_connection" "peering_connection" {
   peer_vpc_id = var.default_vpc_id # asking for peering connection
   vpc_id      = aws_vpc.main.id # this vpc has to accept the request , our created vpc
   auto_accept = true
+  tags = merge(
+    var.tags ,
+    { Name = "${var.env}-peer " }
+  )
 }
 
 ## Public Subnets
@@ -65,6 +69,11 @@ resource "aws_route_table" "public-route-table" {
     gateway_id = aws_internet_gateway.igw.id
   }
 
+  route {
+    cidr_block = data.aws_vpc.default_vpc.cidr_block
+    vpc_peering_connection_id = aws_vpc_peering_connection.peering_connection.id
+  }
+
   for_each = var.public_subnets
   tags = merge(
     var.tags ,
@@ -95,6 +104,8 @@ resource "aws_subnet" "private_subnets" {
     var.tags ,
     { Name = "${var.env}-${each.value["name"]}"}
   )
+
+
 }
 
 # Private Route Tables
@@ -106,7 +117,10 @@ resource "aws_route_table" "private-route-table" {
     cidr_block = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat_gateways["public-${split("-", each.value["name"])[1]}"].id
   }
-
+  route {
+    cidr_block = data.aws_vpc.default_vpc.cidr_block
+    vpc_peering_connection_id = aws_vpc_peering_connection.peering_connection.id
+  }
 
   tags = merge(
     var.tags ,
