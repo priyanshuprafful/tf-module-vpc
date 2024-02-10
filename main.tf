@@ -90,7 +90,7 @@ resource "aws_subnet" "private_subnets" {
 }
 locals {
   for_each = var.private_subnets
-  az = split("-", "each.value["name"]")[1]
+  az = split("-" , "each.value[name]")[1]
 }
 # Private Route Tables
 resource "aws_route_table" "private-route-table" {
