@@ -11,7 +11,7 @@ resource "aws_vpc_peering_connection" "peering_connection" {
   peer_owner_id = data.aws_caller_identity.account.id
   peer_vpc_id = var.default_vpc_id # asking for peering connection
   vpc_id      = aws_vpc.main.id # this vpc has to accept the request , our created vpc
-  auto_accept = true 
+  auto_accept = true
 }
 
 ## Public Subnets
