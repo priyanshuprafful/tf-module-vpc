@@ -137,7 +137,7 @@ resource "aws_route_table_association" "private-association" {
 
 }
 
-# adding peering connection in the default vpc route table or Route to the default VPC for peering to work 
+# adding peering connection in the default vpc route table or Route to the default VPC for peering to work
 
 resource "aws_route" "route" {
 
